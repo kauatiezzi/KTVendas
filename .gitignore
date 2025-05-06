@@ -1,6 +1,6 @@
 # Arquivos do PHP
 *.log
-.env
+*.env
 
 # Outras pastas ou arquivos que você não quer enviar
 /vendor/
