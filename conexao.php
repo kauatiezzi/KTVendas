@@ -1,21 +1,20 @@
 <?php
-// Carregar as variáveis de ambiente
-require 'vendor/autoload.php'; // Carrega o Composer autoloader
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load(); // Carrega as variáveis do .env
-
-// Usando as variáveis do .env para configurar a conexão com o banco de dados
-$host = $_ENV['DB_HOST'];
-$username = $_ENV['DB_USERNAME'];
-$password = $_ENV['DB_PASSWORD'];
-$dbname = $_ENV['DB_DATABASE'];
-
-// Conexão com o banco de dados usando PDO
-try {
-    $dsn = "mysql:host=$host;dbname=$dbname";
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo 'Erro na conexão: ' . $e->getMessage();
+$env = getenv('DATABASE_URL');
+if ($env) {
+    $url = parse_url($env);
+    $host = $url["host"];
+    $user = $url["user"];
+    $pass = $url["pass"];
+    $db   = ltrim($url["path"], '/');
+    
+    try {
+        $pdo = new PDO("pgsql:host=$host;dbname=$db", $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
+    } catch (PDOException $e) {
+        die("Erro de conexão: " . $e->getMessage());
+    }
+} else {
+    die("Variável DATABASE_URL não encontrada.");
 }
 ?>
